@@ -48,7 +48,8 @@ function Student() {
       <Button
         type="primary"
         onClick={showModalS}
-        style={{ backgroundColor: "#13c2c2" }}
+        style={{ backgroundColor: "#13c2c2", marginBottom: "20px" ,marginTop: "20px",width: "250px"}}
+        size="large"
       >
         الطالب
       </Button>

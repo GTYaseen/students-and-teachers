@@ -52,7 +52,8 @@ function Teacher() {
       <Button
         type="primary"
         onClick={showModalT}
-        style={{ backgroundColor: "#13c2c2" }}
+        style={{ backgroundColor: "#13c2c2", marginBottom: "20px",width: "250px"}}
+        size="large"
       >
         الاستاذ
       </Button>

@@ -25,12 +25,8 @@ function App() {
       <Header brand={"Kataki"} headerLinks={headerLinks} />
       <Container>
         <div className="App">
-          <div>
-            <Student />
-          </div>
-          <div>
-            <Teacher />
-          </div>
+          <Student />
+          <Teacher />
         </div>
       </Container>
     </>
