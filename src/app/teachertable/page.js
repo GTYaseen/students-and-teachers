@@ -1,18 +1,28 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Table } from "antd";
+import { Modal, Table } from "antd";
 import Container from "../components/container/Container";
+import { Input } from "antd";
 import axios from "axios";
 import { Header } from "../components/header/Header";
-import { Button } from "antd";
+import { Button, Popconfirm } from "antd";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { FaHome } from "react-icons/fa";
+import { PiStudentBold } from "react-icons/pi";
+import { FaChalkboardTeacher } from "react-icons/fa";
+import { IoMdOptions } from "react-icons/io";
 
 function Page() {
-  const [list, setList] = useState([]); // State to store the data
+  const [list, setList] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [teacherData, setTeacherData] = useState({
+    name: "",
+    age: "",
+    sp: "",
+  });
 
   useEffect(() => {
-    // Fetch data when the component mounts
     axios
       .get("http://localhost:5001/api/getTeacherData")
       .then((response) => {
@@ -22,8 +32,58 @@ function Page() {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, []); // Empty dependency array ensures the effect runs once when the component mounts
-  console.log(list);
+  }, [list]);
+  const handleDelete = (id) => {
+    axios
+      .delete(`http://localhost:5001/api/deleteTeacherData/${id}`)
+      .then((response) => {
+        console.log(response.data);
+        // Update the state after successful deletion
+        setList((prevList) => prevList.filter((item) => item.id !== id));
+      })
+      .catch((error) => {
+        console.error("Error deleting data:", error);
+      });
+  };
+  const handleOk = async () => {
+    const { id, name, age, sp } = teacherData;
+    try {
+      const response = await axios.put(
+        `http://localhost:5001/api/updateTeacherData/${id}`,
+        {
+          name,
+          age,
+          sp,
+        }
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error sending data:", error);
+    }
+    setIsModalOpen(false);
+  };
+  const showModal = (id) => {
+    setTeacherData({
+      name: "", // Reset the form when opening the modal
+      age: "",
+      sp: "",
+    });
+    setIsModalOpen(true);
+    // Set the id in the teacherData state
+    setTeacherData((prevData) => ({
+      ...prevData,
+      id,
+    }));
+  };
+  const handleTeacherInputChange = (field, value) => {
+    setTeacherData({
+      ...teacherData,
+      [field]: value,
+    });
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   const columns = [
     {
       title: "ID",
@@ -32,17 +92,17 @@ function Page() {
     },
     {
       title: "Name",
-      dataIndex: "teachername", // Update to match the actual property name
+      dataIndex: "teachername",
       key: "teachername",
     },
     {
       title: "Age",
-      dataIndex: "teacherage", // Update to match the actual property name
+      dataIndex: "teacherage",
       key: "teacherage",
     },
     {
       title: "Specialization",
-      dataIndex: "teachersp", // Update to match the actual property name
+      dataIndex: "teachersp",
       key: "teachersp",
     },
     {
@@ -52,12 +112,17 @@ function Page() {
         <span
           style={{ display: "flex", justifyContent: "center", gap: "10px" }}
         >
-          <Button size="large">
+          <Button size="large" onClick={() => showModal(record.id)}>
             <FaEdit style={{ fontSize: "25px" }} />
           </Button>
-          <Button size="large" danger>
-            <MdDelete style={{ fontSize: "25px" }} />
-          </Button>
+          <Popconfirm
+            title="Are you sure?"
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button size="large" danger>
+              <MdDelete style={{ fontSize: "25px" }} />
+            </Button>
+          </Popconfirm>
         </span>
       ),
     },
@@ -65,21 +130,60 @@ function Page() {
 
   const headerLinks = [
     {
-      title: "Home",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            fontSize: "25px",
+            gap: "5px",
+          }}
+        >
+          <FaHome />
+          Home
+        </div>
+      ),
       href: "/",
     },
     {
-      title: "Students",
+      title: (
+        <div
+          style={{ display: "flex", alignItems: "center", fontSize: "25px" }}
+        >
+          <PiStudentBold />
+          Students
+        </div>
+      ),
       href: "/studentTable",
     },
     {
-      title: "Teachers",
+      title: (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            fontSize: "25px",
+            gap: "5px",
+          }}
+        >
+          <FaChalkboardTeacher />
+          Teachers
+        </div>
+      ),
       href: "/teachertable",
     },
   ];
   return (
     <div>
-      <Header brand={"Kataki"} headerLinks={headerLinks} />
+      <Header
+        brand={
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <IoMdOptions style={{ fontSize: "50px" }} />
+            <p>Admin</p>
+          </div>
+        }
+        headerLinks={headerLinks}
+      />
       <Container>
         <h1 style={{ textAlign: "center", marginTop: "20px", color: "white" }}>
           Teacher
@@ -89,6 +193,23 @@ function Page() {
           dataSource={list}
           style={{ marginTop: "20px" }}
         />
+        <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+          <p>اسم الاستاذ</p>
+          <Input
+            placeholder="حسين"
+            onChange={(e) => handleTeacherInputChange("name", e.target.value)}
+          />
+          <p>عمر الاستاذ</p>
+          <Input
+            placeholder="91"
+            onChange={(e) => handleTeacherInputChange("age", e.target.value)}
+          />
+          <p>تخصص</p>
+          <Input
+            placeholder="تاريخ"
+            onChange={(e) => handleTeacherInputChange("sp", e.target.value)}
+          />
+        </Modal>
       </Container>
     </div>
   );
