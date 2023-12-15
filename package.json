@@ -1,0 +1,28 @@
+{
+  "name": "test",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "next lint",
+    "start": "concurrently \"npm run server1\" \"npm run server2\" \"npm run client\"",
+    "server1": "node serverS.cjs",
+    "server2": "node serverT.cjs",
+    "client": "npm run dev"
+  },
+  "dependencies": {
+    "antd": "^5.11.5",
+    "axios": "^1.6.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "next": "14.0.4",
+    "nodemon": "^3.0.2",
+    "pg": "^8.11.3",
+    "react": "^18",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0"
+  }
+}
